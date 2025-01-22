@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - Campus Vehicle Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #7C3AED;
+            --secondary-color: #EC4899;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+            --background-color: #F9FAFB;
+            --card-bg: #FFFFFF;
+            --text-primary: #1F2937;
+            --text-secondary: #6B7280;
+            --border-color: #E5E7EB;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .payment-container {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            padding: 2rem;
+        }
+
+        .payment-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .payment-header h1 {
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .payment-header p {
+            color: var(--text-secondary);
+        }
+
+        .payment-details {
+            background: #F8FAFC;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .detail-row.total {
+            border-top: 1px solid var(--border-color);
+            margin-top: 1rem;
+            padding-top: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .payment-methods {
+            margin-bottom: 2rem;
+        }
+
+        .payment-method {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .payment-method:hover {
+            border-color: var(--primary-color);
+        }
+
+        .payment-method.selected {
+            border-color: var(--primary-color);
+            background: rgba(124, 58, 237, 0.05);
+        }
+
+        .payment-method img {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+        }
+
+        .method-details {
+            flex: 1;
+        }
+
+        .method-details h3 {
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .method-details p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .pay-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            width: 100%;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pay-button:hover {
+            background: #6D28D9;
+        }
+
+        .pay-button:disabled {
+            background: #CBD5E1;
+            cursor: not-allowed;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin-bottom: 1rem;
+        }
+
+        .back-button:hover {
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <a href="javascript:history.back()" class="back-button">
+            <i class="fas fa-arrow-left"></i>
+            Back
+        </a>
+        <div class="payment-header">
+            <h1>Payment Details</h1>
+            <p>Complete your payment to join the carpool</p>
+        </div>
+
+        <div class="payment-details">
+            <div class="detail-row">
+                <span>Route</span>
+                <span id="routeText">Loading...</span>
+            </div>
+            <div class="detail-row">
+                <span>Departure</span>
+                <span id="departureText">Loading...</span>
+            </div>
+            <div class="detail-row">
+                <span>Seats Available</span>
+                <span id="seatsText">Loading...</span>
+            </div>
+            <div class="detail-row">
+                <span>Carpool Fee</span>
+                <span>€5.00</span>
+            </div>
+            <div class="detail-row">
+                <span>Service Fee</span>
+                <span>€0.50</span>
+            </div>
+            <div class="detail-row total">
+                <span>Total</span>
+                <span>€5.50</span>
+            </div>
+        </div>
+
+        <div class="payment-methods">
+            <div class="payment-method selected" onclick="selectPaymentMethod(this)">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa">
+                <div class="method-details">
+                    <h3>Credit/Debit Card</h3>
+                    <p>Pay securely with your card</p>
+                </div>
+                <i class="fas fa-check-circle" style="color: var(--primary-color)"></i>
+            </div>
+            <div class="payment-method" onclick="selectPaymentMethod(this)">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal">
+                <div class="method-details">
+                    <h3>PayPal</h3>
+                    <p>Pay with your PayPal account</p>
+                </div>
+            </div>
+            <div class="payment-method" onclick="selectPaymentMethod(this)">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/4/46/Apple_Pay_logo.svg" alt="Apple Pay">
+                <div class="method-details">
+                    <h3>Apple Pay</h3>
+                    <p>Quick payment with Apple Pay</p>
+                </div>
+            </div>
+        </div>
+
+        <button class="pay-button" onclick="processPayment()">
+            Pay €5.50
+        </button>
+    </div>
+
+    <script>
+        // Load carpool details when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            const carpoolDetails = JSON.parse(localStorage.getItem('selectedCarpool'));
+            if (carpoolDetails) {
+                document.getElementById('routeText').textContent = 
+                    `${carpoolDetails.startPoint} → ${carpoolDetails.endPoint}`;
+                document.getElementById('departureText').textContent = 
+                    carpoolDetails.departure.replace('Departure: ', '');
+                document.getElementById('seatsText').textContent = 
+                    carpoolDetails.seatsAvailable;
+            }
+        });
+
+        function selectPaymentMethod(element) {
+            // Remove selected class from all methods
+            document.querySelectorAll('.payment-method').forEach(method => {
+                method.classList.remove('selected');
+                const checkIcon = method.querySelector('.fa-check-circle');
+                if (checkIcon) checkIcon.remove();
+            });
+
+            // Add selected class to clicked method
+            element.classList.add('selected');
+            
+            // Add check icon
+            const checkIcon = document.createElement('i');
+            checkIcon.className = 'fas fa-check-circle';
+            checkIcon.style.color = 'var(--primary-color)';
+            element.appendChild(checkIcon);
+        }
+
+        function processPayment() {
+            // Show loading state
+            const payButton = document.querySelector('.pay-button');
+            const originalText = payButton.textContent;
+            payButton.disabled = true;
+            payButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+            // Simulate payment processing
+            setTimeout(() => {
+                alert('Payment successful! You have joined the carpool.');
+                window.location.href = 'carpools.html';
+            }, 2000);
+        }
+    </script>
+</body>
+</html> 

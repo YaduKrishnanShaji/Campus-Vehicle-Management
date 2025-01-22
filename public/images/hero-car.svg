@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background Circles -->
+    <circle cx="600" cy="300" r="250" fill="#C7D2FE" opacity="0.3"/>
+    <circle cx="200" cy="400" r="150" fill="#818CF8" opacity="0.2"/>
+    
+    <!-- Car Body -->
+    <path d="M200 350 L500 350 C550 350 600 300 600 250 L600 200 C600 150 550 100 500 100 L300 100 C250 100 200 150 200 200 L200 350" fill="#4F46E5"/>
+    
+    <!-- Windows -->
+    <path d="M300 150 L450 150 C500 150 550 200 550 250 L550 300 L250 300 L250 200 C250 170 270 150 300 150" fill="#C7D2FE"/>
+    
+    <!-- Wheels -->
+    <circle cx="300" cy="350" r="50" fill="#1F2937"/>
+    <circle cx="300" cy="350" r="25" fill="#6B7280"/>
+    <circle cx="500" cy="350" r="50" fill="#1F2937"/>
+    <circle cx="500" cy="350" r="25" fill="#6B7280"/>
+    
+    <!-- Headlight -->
+    <circle cx="200" cy="200" r="20" fill="#FCD34D"/>
+    
+    <!-- People -->
+    <circle cx="350" cy="200" r="30" fill="#6366F1"/>
+    <circle cx="450" cy="200" r="30" fill="#6366F1"/>
+    
+    <!-- Road -->
+    <path d="M0 400 L800 400" stroke="#1F2937" stroke-width="5"/>
+    <path d="M50 400 L100 400" stroke="#FFFFFF" stroke-width="5"/>
+    <path d="M150 400 L200 400" stroke="#FFFFFF" stroke-width="5"/>
+    <path d="M250 400 L300 400" stroke="#FFFFFF" stroke-width="5"/>
+    <path d="M350 400 L400 400" stroke="#FFFFFF" stroke-width="5"/>
+    <path d="M450 400 L500 400" stroke="#FFFFFF" stroke-width="5"/>
+    <path d="M550 400 L600 400" stroke="#FFFFFF" stroke-width="5"/>
+    <path d="M650 400 L700 400" stroke="#FFFFFF" stroke-width="5"/>
+    <path d="M750 400 L800 400" stroke="#FFFFFF" stroke-width="5"/>
+</svg> 

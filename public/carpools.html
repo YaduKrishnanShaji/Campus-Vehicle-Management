@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carpools - Campus Vehicle Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Replace Google Maps with OpenStreetMap -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        /* Reuse the common styles from dashboard.html */
+        :root {
+            --primary-color: #7C3AED;
+            --secondary-color: #EC4899;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+            --background-color: #F9FAFB;
+            --sidebar-bg: #FFFFFF;
+            --card-bg: #FFFFFF;
+            --text-primary: #1F2937;
+            --text-secondary: #6B7280;
+            --border-color: #E5E7EB;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Reuse sidebar and common styles */
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .brand img {
+            width: 32px;
+            height: 32px;
+        }
+
+        .brand span {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .nav-item:hover:not(.active) {
+            background-color: #F3F4F6;
+            color: var(--primary-color);
+        }
+
+        .nav-item i {
+            width: 1.5rem;
+            margin-right: 0.75rem;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 2rem;
+            width: calc(100% - 260px);
+        }
+
+        /* Header Section */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .search-bar {
+            flex: 1;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .user-info h4 {
+            font-weight: 500;
+        }
+
+        .user-info p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Carpool-specific styles */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .create-carpool-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .create-carpool-btn:hover {
+            background: #6D28D9;
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .filter-select {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            background: white;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .carpools-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .carpool-card {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            display: flex;
+            gap: 2rem;
+        }
+
+        .carpool-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .carpool-info {
+            flex: 1;
+        }
+
+        .carpool-route {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .route-point {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .route-line {
+            flex: 1;
+            height: 2px;
+            background: var(--border-color);
+            position: relative;
+        }
+
+        .route-line::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary-color);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .carpool-card:hover .route-line::before {
+            transform: scaleX(1);
+        }
+
+        .carpool-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .carpool-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            width: fit-content;
+        }
+
+        .status-scheduled {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary-color);
+        }
+
+        .status-in-progress {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .status-completed {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .carpool-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #F3F4F6;
+            color: var(--text-primary);
+        }
+
+        .btn-primary:hover {
+            background: #6D28D9;
+        }
+
+        .btn-secondary:hover {
+            background: #E5E7EB;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            width: 90%;
+            max-width: 600px;
+            margin: 2rem auto;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            .carpool-card {
+                flex-direction: column;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Tracking Modal Styles */
+        .tracking-modal .modal-content {
+            max-width: 900px;
+            height: 80vh;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tracking-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            border-radius: 1rem 1rem 0 0;
+        }
+
+        .tracking-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .tracking-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+            border-radius: 2rem;
+            font-size: 0.875rem;
+        }
+
+        .tracking-body {
+            display: flex;
+            flex: 1;
+            height: calc(100% - 70px);
+        }
+
+        .tracking-sidebar {
+            width: 300px;
+            background: white;
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+
+        .map-container {
+            flex: 1;
+            background: #f1f5f9;
+        }
+
+        #trackingMap {
+            width: 100%;
+            height: 100%;
+            background: #f1f5f9;
+            z-index: 1;
+        }
+
+        .route-info {
+            margin-bottom: 2rem;
+        }
+
+        .route-info h3 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .route-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .timeline-point {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+            padding-left: 1rem;
+            position: relative;
+        }
+
+        .timeline-point::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 24px;
+            bottom: -24px;
+            width: 2px;
+            background: var(--border-color);
+        }
+
+        .timeline-point:last-child::before {
+            display: none;
+        }
+
+        .timeline-icon {
+            width: 24px;
+            height: 24px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.75rem;
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-content h4 {
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .timeline-content p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .driver-info {
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .driver-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .driver-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .driver-details h4 {
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .driver-details p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .vehicle-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .vehicle-info p {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        /* Update map container styles */
+        #trackingMap {
+            width: 100%;
+            height: 100%;
+            background: #f1f5f9;
+            z-index: 1;
+        }
+
+        .leaflet-popup-content {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+        }
+
+        .leaflet-popup-content h3 {
+            margin: 0 0 5px 0;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .leaflet-popup-content p {
+            margin: 0;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="brand">
+            <i class="fas fa-car-side"></i>
+            <span>CampusRide</span>
+        </div>
+        <nav class="nav-menu">
+            <a href="dashboard.html" class="nav-item">
+                <i class="fas fa-home"></i>
+                Dashboard
+            </a>
+            <a href="vehicles.html" class="nav-item">
+                <i class="fas fa-car"></i>
+                Vehicles
+            </a>
+            <a href="carpools.html" class="nav-item active">
+                <i class="fas fa-users"></i>
+                Carpools
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-bell"></i>
+                Notifications
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-cog"></i>
+                Settings
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Add Header Section -->
+        <div class="header">
+            <div class="search-bar">
+                <input type="text" placeholder="Search...">
+            </div>
+            <div class="user-profile">
+                <div class="user-avatar" id="userInitials">JS</div>
+                <div class="user-info">
+                    <h4 id="userName">John Smith</h4>
+                    <p>Admin</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-header">
+            <h1 class="page-title">Carpool Management</h1>
+            <button class="create-carpool-btn" onclick="openCreateCarpoolModal()">
+                <i class="fas fa-plus"></i>
+                Create Carpool
+            </button>
+        </div>
+
+        <div class="filters">
+            <select class="filter-select">
+                <option value="all">All Carpools</option>
+                <option value="scheduled">Scheduled</option>
+                <option value="in-progress">In Progress</option>
+                <option value="completed">Completed</option>
+            </select>
+            <select class="filter-select">
+                <option value="all">All Routes</option>
+                <option value="library">Library Route</option>
+                <option value="dorm">Dormitory Route</option>
+                <option value="sports">Sports Complex</option>
+            </select>
+        </div>
+
+        <div class="carpools-list">
+            <!-- Carpool Card 1 -->
+            <div class="carpool-card">
+                <div class="carpool-info">
+                    <div class="carpool-route">
+                        <div class="route-point">
+                            <i class="fas fa-circle text-primary"></i>
+                            <span>Main Gate</span>
+                        </div>
+                        <div class="route-line"></div>
+                        <div class="route-point">
+                            <i class="fas fa-circle text-primary"></i>
+                            <span>Library</span>
+                        </div>
+                        <div class="route-line"></div>
+                        <div class="route-point">
+                            <i class="fas fa-circle text-primary"></i>
+                            <span>Dorm A</span>
+                        </div>
+                    </div>
+                    <div class="carpool-details">
+                        <div class="detail-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Departure: 9:00 AM</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-users"></i>
+                            <span>3/4 Seats Available</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-car"></i>
+                            <span>Toyota Camry (ABC 123)</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-user"></i>
+                            <span>Driver: John Smith</span>
+                        </div>
+                    </div>
+                    <span class="carpool-status status-scheduled">Scheduled</span>
+                </div>
+                <div class="carpool-actions">
+                    <button class="action-btn btn-primary" onclick="joinCarpool(this)">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Join Carpool
+                    </button>
+                    <button class="action-btn btn-secondary">
+                        <i class="fas fa-info-circle"></i>
+                        Details
+                    </button>
+                </div>
+            </div>
+
+            <!-- Carpool Card 2 -->
+            <div class="carpool-card">
+                <div class="carpool-info">
+                    <div class="carpool-route">
+                        <div class="route-point">
+                            <i class="fas fa-circle text-primary"></i>
+                            <span>Sports Complex</span>
+                        </div>
+                        <div class="route-line"></div>
+                        <div class="route-point">
+                            <i class="fas fa-circle text-primary"></i>
+                            <span>Student Center</span>
+                        </div>
+                        <div class="route-line"></div>
+                        <div class="route-point">
+                            <i class="fas fa-circle text-primary"></i>
+                            <span>Engineering Building</span>
+                        </div>
+                    </div>
+                    <div class="carpool-details">
+                        <div class="detail-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Departure: 10:30 AM</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-users"></i>
+                            <span>2/4 Seats Available</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-car"></i>
+                            <span>Honda CR-V (XYZ 789)</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-user"></i>
+                            <span>Driver: Sarah Johnson</span>
+                        </div>
+                    </div>
+                    <span class="carpool-status status-in-progress">In Progress</span>
+                </div>
+                <div class="carpool-actions">
+                    <button class="action-btn btn-primary" disabled>
+                        <i class="fas fa-clock"></i>
+                        In Progress
+                    </button>
+                    <button class="action-btn btn-secondary">
+                        <i class="fas fa-map-marker-alt"></i>
+                        Track
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Create Carpool Modal -->
+    <div id="createCarpoolModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create New Carpool</h2>
+                <button class="close-modal" onclick="closeCreateCarpoolModal()">&times;</button>
+            </div>
+            <form id="createCarpoolForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="startPoint">Start Point</label>
+                        <select id="startPoint" name="startPoint" required>
+                            <option value="">Select Start Point</option>
+                            <option value="main-gate">Main Gate</option>
+                            <option value="library">Library</option>
+                            <option value="dorm-a">Dorm A</option>
+                            <option value="sports-complex">Sports Complex</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="endPoint">End Point</label>
+                        <select id="endPoint" name="endPoint" required>
+                            <option value="">Select End Point</option>
+                            <option value="main-gate">Main Gate</option>
+                            <option value="library">Library</option>
+                            <option value="dorm-a">Dorm A</option>
+                            <option value="sports-complex">Sports Complex</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="date">Date</label>
+                        <input type="date" id="date" name="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="time">Time</label>
+                        <input type="time" id="time" name="time" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="vehicle">Select Vehicle</label>
+                        <select id="vehicle" name="vehicle" required>
+                            <option value="">Select Vehicle</option>
+                            <option value="1">Toyota Camry (ABC 123)</option>
+                            <option value="2">Honda CR-V (XYZ 789)</option>
+                            <option value="3">Ford Transit (DEF 456)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="seats">Available Seats</label>
+                        <input type="number" id="seats" name="seats" min="1" max="8" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="notes">Additional Notes</label>
+                    <textarea id="notes" name="notes" rows="3"></textarea>
+                </div>
+                <button type="submit" class="create-carpool-btn" style="width: 100%;">Create Carpool</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tracking Modal -->
+    <div id="trackingModal" class="modal tracking-modal">
+        <div class="modal-content">
+            <div class="tracking-header">
+                <div class="tracking-info">
+                    <h2>Track Carpool</h2>
+                    <div class="tracking-status">
+                        <i class="fas fa-circle"></i>
+                        <span>In Progress</span>
+                    </div>
+                </div>
+                <button class="close-modal" onclick="closeTrackingModal()">&times;</button>
+            </div>
+            <div class="tracking-body">
+                <div class="tracking-sidebar">
+                    <div class="route-info">
+                        <h3>Route Details</h3>
+                        <div class="route-timeline">
+                            <div class="timeline-point">
+                                <div class="timeline-icon">
+                                    <i class="fas fa-circle"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h4>Sports Complex</h4>
+                                    <p>Departed at 10:30 AM</p>
+                                </div>
+                            </div>
+                            <div class="timeline-point">
+                                <div class="timeline-icon">
+                                    <i class="fas fa-circle"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h4>Student Center</h4>
+                                    <p>Estimated: 10:40 AM</p>
+                                </div>
+                            </div>
+                            <div class="timeline-point">
+                                <div class="timeline-icon">
+                                    <i class="fas fa-circle"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h4>Engineering Building</h4>
+                                    <p>Estimated: 10:50 AM</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="driver-info">
+                        <div class="driver-header">
+                            <div class="driver-avatar">SJ</div>
+                            <div class="driver-details">
+                                <h4>Sarah Johnson</h4>
+                                <p>4.9 ★ • 120 trips</p>
+                            </div>
+                        </div>
+                        <div class="vehicle-info">
+                            <p><i class="fas fa-car"></i> Honda CR-V (XYZ 789)</p>
+                            <p><i class="fas fa-users"></i> 2/4 Seats Available</p>
+                            <p><i class="fas fa-tachometer-alt"></i> 8,500 km</p>
+                            <p><i class="fas fa-phone"></i> Contact Driver</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="map-container">
+                    <div id="trackingMap"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize user data
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('user')) || {
+                firstName: 'John',
+                lastName: 'Smith',
+                role: 'Admin'
+            };
+
+            document.getElementById('userName').textContent = `${user.firstName} ${user.lastName}`;
+            document.getElementById('userInitials').textContent = `${user.firstName[0]}${user.lastName[0]}`;
+        });
+
+        function openCreateCarpoolModal() {
+            document.getElementById('createCarpoolModal').style.display = 'block';
+        }
+
+        function closeCreateCarpoolModal() {
+            document.getElementById('createCarpoolModal').style.display = 'none';
+        }
+
+        // Handle form submission
+        document.getElementById('createCarpoolForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Add your form submission logic here
+            alert('Carpool created successfully!');
+            closeCreateCarpoolModal();
+        });
+
+        // Important locations in Liepaja
+        const IMPORTANT_LOCATIONS = [
+            {
+                name: "Liepaja University",
+                lat: 56.5089,
+                lng: 21.0100,
+                description: "Main campus and student center"
+            },
+            {
+                name: "Great Amber Concert Hall",
+                lat: 56.5115,
+                lng: 21.0105,
+                description: "Cultural and event venue"
+            },
+            {
+                name: "Liepaja Olympic Center",
+                lat: 56.5195,
+                lng: 21.0174,
+                description: "Sports complex and swimming pool"
+            },
+            {
+                name: "Rožu Square",
+                lat: 56.5078,
+                lng: 21.0123,
+                description: "Central city square and meeting point"
+            },
+            {
+                name: "Liepaja Beach",
+                lat: 56.5089,
+                lng: 20.9967,
+                description: "Popular beach area"
+            },
+            {
+                name: "Railway Station",
+                lat: 56.5024,
+                lng: 21.0129,
+                description: "Main transportation hub"
+            },
+            {
+                name: "City Center Mall",
+                lat: 56.5151,
+                lng: 21.0116,
+                description: "Shopping and entertainment"
+            }
+        ];
+
+        let map;
+        const LIEPAJA_CENTER = {
+            lat: 56.5047,
+            lng: 21.0107
+        };
+
+        function initMap() {
+            // Create map centered on Liepaja
+            map = L.map('trackingMap').setView([LIEPAJA_CENTER.lat, LIEPAJA_CENTER.lng], 14);
+
+            // Add OpenStreetMap tiles
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            // Add markers for important locations
+            IMPORTANT_LOCATIONS.forEach(location => {
+                const marker = L.marker([location.lat, location.lng])
+                    .bindPopup(`
+                        <h3>${location.name}</h3>
+                        <p>${location.description}</p>
+                    `)
+                    .addTo(map);
+            });
+        }
+
+        function openTrackingModal() {
+            const modal = document.getElementById('trackingModal');
+            modal.style.display = 'block';
+            
+            // Initialize map after modal is visible
+            setTimeout(() => {
+                if (!map) {
+                    initMap();
+                } else {
+                    map.invalidateSize();
+                }
+            }, 100);
+        }
+
+        function closeTrackingModal() {
+            document.getElementById('trackingModal').style.display = 'none';
+        }
+
+        // Update the onclick handler for track buttons
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            if (btn.textContent.trim() === 'Track') {
+                btn.onclick = openTrackingModal;
+            }
+        });
+
+        // Close tracking modal when clicking outside
+        window.onclick = function(event) {
+            const trackingModal = document.getElementById('trackingModal');
+            const createModal = document.getElementById('createCarpoolModal');
+            
+            if (event.target === trackingModal) {
+                trackingModal.style.display = 'none';
+            }
+            if (event.target === createModal) {
+                createModal.style.display = 'none';
+            }
+        }
+
+        function joinCarpool(button) {
+            // Get carpool details from the card
+            const carpoolCard = button.closest('.carpool-card');
+            const startPoint = carpoolCard.querySelector('.route-point:first-child span').textContent;
+            const endPoint = carpoolCard.querySelector('.route-point:last-child span').textContent;
+            const departure = carpoolCard.querySelector('.detail-item:first-child span').textContent;
+            const seatsAvailable = carpoolCard.querySelector('.detail-item:nth-child(2) span').textContent;
+
+            // Store carpool details in localStorage for the payment page
+            localStorage.setItem('selectedCarpool', JSON.stringify({
+                startPoint,
+                endPoint,
+                departure,
+                seatsAvailable
+            }));
+
+            // Redirect to payment page
+            window.location.href = 'payment.html';
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Vehicle Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/landing.css">
+    <style>
+        :root {
+            --primary-color: #7C3AED;
+            --primary-light: #A78BFA;
+            --secondary-color: #EC4899;
+            --gradient-start: #7C3AED;
+            --gradient-end: #EC4899;
+            --text-color: #1F2937;
+            --light-text: #6B7280;
+            --background: #F9FAFB;
+            --white: #FFFFFF;
+            --accent: #EDE9FE;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --danger: #EF4444;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i class="fas fa-car-side"></i>
+            <span>CampusRide</span>
+        </div>
+        <div class="nav-links">
+            <a href="#" class="active">Home</a>
+            <a href="#">Vehicles</a>
+            <a href="#">Carpools</a>
+            <a href="#">About</a>
+        </div>
+        <div class="auth-buttons">
+            <a href="register.html" class="register">Create Account</a>
+            <a href="login.html" class="login">Sign In</a>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h1 class="hero-title">Campus Vehicle Management System</h1>
+                <p class="hero-subtitle">Efficiently manage and coordinate campus transportation with our comprehensive vehicle management system.</p>
+                <div class="hero-buttons">
+                    <a href="register.html" class="primary-button">
+                        <i class="fas fa-user-plus"></i>
+                        Create Account
+                    </a>
+                    <a href="login.html" class="secondary-button">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Sign In
+                    </a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <div class="stat-number">500+</div>
+                        <div class="stat-label">Active Users</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">200+</div>
+                        <div class="stat-label">Registered Vehicles</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">1000+</div>
+                        <div class="stat-label">Successful Rides</div>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-image">
+                <img src="images/Hero.jpg" alt="Campus Transportation">
+            </div>
+        </section>
+
+        <section class="features">
+            <h2>Why Choose <span class="gradient-text">CampusRide</span>?</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <h3>Safe & Secure</h3>
+                    <p>Verified users and secure payment system</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check"></i> Identity verification</li>
+                        <li><i class="fas fa-check"></i> Secure payments</li>
+                        <li><i class="fas fa-check"></i> 24/7 support</li>
+                        <li><i class="fas fa-check"></i> Emergency assistance</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-location-crosshairs"></i>
+                    </div>
+                    <h3>Real-time Tracking</h3>
+                    <p>Know exactly where your ride is</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check"></i> Live GPS tracking</li>
+                        <li><i class="fas fa-check"></i> Route optimization</li>
+                        <li><i class="fas fa-check"></i> ETA updates</li>
+                        <li><i class="fas fa-check"></i> Journey sharing</li>
+                    </ul>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users-between-lines"></i>
+                    </div>
+                    <h3>Community Driven</h3>
+                    <p>Build connections with fellow students</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check"></i> Student network</li>
+                        <li><i class="fas fa-check"></i> Shared interests</li>
+                        <li><i class="fas fa-check"></i> Rating system</li>
+                        <li><i class="fas fa-check"></i> Community events</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- RTU Benefits Section -->
+        <section class="rtu-benefits">
+            <div class="benefits-container">
+                <h2>Perfect for <span class="gradient-text">RTU Students</span></h2>
+                <div class="benefits-grid">
+                    <!-- Save Money Card -->
+                    <div class="benefit-card">
+                        <div class="benefit-icon">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <h3>Save Money</h3>
+                        <p>Share rides and split costs with fellow students</p>
+                        <ul class="benefit-features">
+                            <li><i class="fas fa-check"></i> Split fuel costs</li>
+                            <li><i class="fas fa-check"></i> Reduce parking fees</li>
+                            <li><i class="fas fa-check"></i> Group discounts</li>
+                            <li><i class="fas fa-check"></i> Monthly savings</li>
+                        </ul>
+                    </div>
+
+                    <!-- Save Time Card -->
+                    <div class="benefit-card">
+                        <div class="benefit-icon">
+                            <i class="fas fa-hourglass-half"></i>
+                        </div>
+                        <h3>Save Time</h3>
+                        <p>Quick and efficient transportation solutions</p>
+                        <ul class="benefit-features">
+                            <li><i class="fas fa-check"></i> No waiting for buses</li>
+                            <li><i class="fas fa-check"></i> Direct routes</li>
+                            <li><i class="fas fa-check"></i> Flexible scheduling</li>
+                            <li><i class="fas fa-check"></i> Quick ride matching</li>
+                        </ul>
+                    </div>
+
+                    <!-- Easy to Use Card -->
+                    <div class="benefit-card">
+                        <div class="benefit-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <h3>Easy to Use</h3>
+                        <p>Simple and intuitive platform for students</p>
+                        <ul class="benefit-features">
+                            <li><i class="fas fa-check"></i> Quick booking</li>
+                            <li><i class="fas fa-check"></i> Real-time updates</li>
+                            <li><i class="fas fa-check"></i> Mobile friendly</li>
+                            <li><i class="fas fa-check"></i> 24/7 support</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="stats">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-car-side"></i>
+                </div>
+                <div class="stat-number">500</div>
+                <div class="stat-label">REGISTERED VEHICLES</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+                <div class="stat-number">1000</div>
+                <div class="stat-label">ACTIVE USERS</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-road"></i>
+                </div>
+                <div class="stat-number">2000</div>
+                <div class="stat-label">SUCCESSFUL RIDES</div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>CampusRide</h3>
+                <p>Making campus transportation efficient and sustainable.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <a href="#">About Us</a>
+                <a href="#">How it Works</a>
+                <a href="#">Safety</a>
+                <a href="#">Contact</a>
+            </div>
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <p><i class="fas fa-envelope"></i> support@campusride.edu</p>
+                <p><i class="fas fa-phone"></i> (555) 123-4567</p>
+            </div>
+            <div class="footer-section">
+                <h3>Follow Us</h3>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 CampusRide. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html> 

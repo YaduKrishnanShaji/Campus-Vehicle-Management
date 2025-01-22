@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Campus Vehicle Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #7C3AED;
+            --secondary-color: #EC4899;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+            --background-color: #F9FAFB;
+            --sidebar-bg: #FFFFFF;
+            --card-bg: #FFFFFF;
+            --text-primary: #1F2937;
+            --text-secondary: #6B7280;
+            --border-color: #E5E7EB;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Reuse sidebar styles */
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .brand span {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .nav-item:hover:not(.active) {
+            background-color: #F3F4F6;
+            color: var(--primary-color);
+        }
+
+        .nav-item i {
+            width: 1.5rem;
+            margin-right: 0.75rem;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 2rem;
+            width: calc(100% - 260px);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .settings-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .settings-card {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .settings-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .settings-header i {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .settings-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.1);
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+        }
+
+        .toggle-switch input {
+            display: none;
+        }
+
+        .toggle-slider {
+            width: 48px;
+            height: 24px;
+            background-color: var(--border-color);
+            border-radius: 12px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-slider:before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: white;
+            top: 2px;
+            left: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: var(--primary-color);
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .save-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .save-button:hover {
+            background: #6D28D9;
+        }
+
+        .danger-zone {
+            border: 1px solid var(--danger-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .danger-zone h3 {
+            color: var(--danger-color);
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .danger-zone p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .delete-button {
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .delete-button:hover {
+            background: #DC2626;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            .settings-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Add these styles for toggle switches */
+        .toggle-group {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 0.5rem;
+        }
+
+        .toggle-group label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .toggle-slider {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+            background-color: #ccc;
+            border-radius: 13px;
+            transition: .4s;
+            margin-left: 1rem;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            border-radius: 50%;
+            transition: .4s;
+        }
+
+        input[type="checkbox"] {
+            display: none;
+        }
+
+        input[type="checkbox"]:checked + .toggle-slider {
+            background-color: #4CAF50;
+        }
+
+        input[type="checkbox"]:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .setting-description {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Styles for settings sections */
+        .settings-section {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .settings-section h2 {
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .settings-form {
+            max-width: 600px;
+        }
+
+        .btn-primary {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: #45a049;
+        }
+
+        /* Add styles for saved notification preferences */
+        .saved-preferences {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #e8f5e9;
+            border-radius: 0.5rem;
+            display: none;
+        }
+
+        .saved-preferences.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="brand">
+            <i class="fas fa-car-side"></i>
+            <span>CampusRide</span>
+        </div>
+        <nav class="nav-menu">
+            <a href="dashboard.html" class="nav-item">
+                <i class="fas fa-home"></i>
+                Dashboard
+            </a>
+            <a href="vehicles.html" class="nav-item">
+                <i class="fas fa-car"></i>
+                Vehicles
+            </a>
+            <a href="carpools.html" class="nav-item">
+                <i class="fas fa-users"></i>
+                Carpools
+            </a>
+            <a href="notifications.html" class="nav-item">
+                <i class="fas fa-bell"></i>
+                Notifications
+            </a>
+            <a href="settings.html" class="nav-item active">
+                <i class="fas fa-cog"></i>
+                Settings
+            </a>
+            <a href="index.html" class="nav-item" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="header">
+            <div class="user-profile">
+                <div class="user-avatar" id="userInitials">JS</div>
+                <div class="user-info">
+                    <h4 id="userName">John Smith</h4>
+                    <p>Admin</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-container">
+            <!-- Profile Settings -->
+            <section class="settings-section">
+                <h2>Profile Settings</h2>
+                <div class="settings-form">
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <input type="text" id="firstName" class="form-control" placeholder="First Name">
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <input type="text" id="lastName" class="form-control" placeholder="Last Name">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" class="form-control" placeholder="Email">
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" class="form-control" placeholder="Phone Number">
+                    </div>
+                    <div class="form-group">
+                        <label for="department">Department</label>
+                        <select id="department" class="form-control">
+                            <option value="computer_science">Computer Science</option>
+                            <option value="engineering">Engineering</option>
+                            <option value="business">Business</option>
+                            <option value="arts">Arts</option>
+                            <option value="medicine">Medicine</option>
+                        </select>
+                    </div>
+                    <button class="btn-primary" onclick="saveProfileSettings()">Save Profile Changes</button>
+                </div>
+            </section>
+
+            <!-- Notification Preferences -->
+            <section class="settings-section">
+                <h2>Notification Preferences</h2>
+                <div class="settings-form">
+                    <div class="toggle-group">
+                        <label>
+                            <span>Email Notifications</span>
+                            <input type="checkbox" id="emailNotif" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <p class="setting-description">Receive notifications about carpools and updates via email</p>
+                    </div>
+                    <div class="toggle-group">
+                        <label>
+                            <span>SMS Notifications</span>
+                            <input type="checkbox" id="smsNotif">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <p class="setting-description">Receive important alerts via SMS</p>
+                    </div>
+                    <div class="toggle-group">
+                        <label>
+                            <span>Push Notifications</span>
+                            <input type="checkbox" id="pushNotif" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <p class="setting-description">Receive instant notifications in your browser</p>
+                    </div>
+                    <button class="btn-primary" onclick="saveNotificationSettings()">Save Notification Preferences</button>
+                </div>
+            </section>
+
+            <!-- Privacy Settings -->
+            <section class="settings-section">
+                <h2>Privacy Settings</h2>
+                <div class="settings-form">
+                    <div class="toggle-group">
+                        <label>
+                            <span>Profile Visibility</span>
+                            <input type="checkbox" id="profileVisibility" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <p class="setting-description">Make your profile visible to other users</p>
+                    </div>
+                    <div class="toggle-group">
+                        <label>
+                            <span>Share Trip History</span>
+                            <input type="checkbox" id="tripHistory">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <p class="setting-description">Allow others to see your past trips</p>
+                    </div>
+                    <button class="btn-primary" onclick="savePrivacySettings()">Save Privacy Settings</button>
+                </div>
+            </section>
+
+            <!-- Payment Settings -->
+            <section class="settings-section">
+                <h2>Payment Settings</h2>
+                <div class="settings-form">
+                    <div class="payment-method">
+                        <h3>Default Payment Method</h3>
+                        <select id="defaultPayment" class="form-control">
+                            <option value="credit_card">Credit Card</option>
+                            <option value="debit_card">Debit Card</option>
+                            <option value="paypal">PayPal</option>
+                            <option value="apple_pay">Apple Pay</option>
+                        </select>
+                    </div>
+                    <div class="payment-info">
+                        <h3>Saved Cards</h3>
+                        <div class="saved-card">
+                            <span>**** **** **** 1234</span>
+                            <button class="btn-secondary">Remove</button>
+                        </div>
+                        <button class="btn-primary" onclick="addPaymentMethod()">Add New Payment Method</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Account Management -->
+            <section class="settings-section danger-zone">
+                <h2>Account Management</h2>
+                <div class="settings-form">
+                    <div class="danger-action">
+                        <h3>Change Password</h3>
+                        <button class="btn-secondary" onclick="changePassword()">Update Password</button>
+                    </div>
+                    <div class="danger-action">
+                        <h3>Deactivate Account</h3>
+                        <p class="warning-text">Temporarily disable your account</p>
+                        <button class="btn-warning" onclick="deactivateAccount()">Deactivate</button>
+                    </div>
+                    <div class="danger-action">
+                        <h3>Delete Account</h3>
+                        <p class="warning-text">Permanently delete your account and all data</p>
+                        <button class="btn-danger" onclick="deleteAccount()">Delete Account</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        // Initialize all settings on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load user data
+            const user = JSON.parse(localStorage.getItem('user')) || {
+                firstName: 'John',
+                lastName: 'Smith',
+                email: 'john.smith@example.com',
+                phone: '+1234567890',
+                department: 'computer_science'
+            };
+
+            // Load notification settings
+            const notificationSettings = JSON.parse(localStorage.getItem('notificationSettings')) || {
+                email: true,
+                sms: false,
+                push: true
+            };
+
+            // Load privacy settings
+            const privacySettings = JSON.parse(localStorage.getItem('privacySettings')) || {
+                profileVisible: true,
+                tripHistoryVisible: false
+            };
+
+            // Load payment settings
+            const paymentSettings = JSON.parse(localStorage.getItem('paymentSettings')) || {
+                defaultPayment: 'credit_card',
+                savedCards: ['**** **** **** 1234']
+            };
+
+            // Populate all form fields
+            document.getElementById('firstName').value = user.firstName;
+            document.getElementById('lastName').value = user.lastName;
+            document.getElementById('email').value = user.email;
+            document.getElementById('phone').value = user.phone;
+            document.getElementById('department').value = user.department;
+
+            // Set notification toggles
+            document.getElementById('emailNotif').checked = notificationSettings.email;
+            document.getElementById('smsNotif').checked = notificationSettings.sms;
+            document.getElementById('pushNotif').checked = notificationSettings.push;
+
+            // Set privacy toggles
+            document.getElementById('profileVisibility').checked = privacySettings.profileVisible;
+            document.getElementById('tripHistory').checked = privacySettings.tripHistoryVisible;
+
+            // Set payment defaults
+            document.getElementById('defaultPayment').value = paymentSettings.defaultPayment;
+
+            // Update header
+            document.getElementById('userName').textContent = `${user.firstName} ${user.lastName}`;
+            document.getElementById('userInitials').textContent = `${user.firstName[0]}${user.lastName[0]}`;
+        });
+
+        function showSuccessMessage(section, message) {
+            const successMessage = document.createElement('div');
+            successMessage.className = 'saved-preferences';
+            successMessage.innerHTML = `<p><i class="fas fa-check-circle"></i> ${message}</p>`;
+            
+            const existingMessage = section.querySelector('.saved-preferences');
+            if (existingMessage) {
+                existingMessage.remove();
+            }
+            
+            section.appendChild(successMessage);
+            setTimeout(() => {
+                successMessage.classList.add('show');
+            }, 10);
+            
+            setTimeout(() => {
+                successMessage.classList.remove('show');
+                setTimeout(() => successMessage.remove(), 300);
+            }, 3000);
+        }
+
+        function validateProfileData(data) {
+            if (!data.firstName || !data.lastName) {
+                alert('Name fields cannot be empty');
+                return false;
+            }
+            if (!data.email.includes('@')) {
+                alert('Please enter a valid email address');
+                return false;
+            }
+            if (!data.phone.match(/^\+?[\d\s-]{10,}$/)) {
+                alert('Please enter a valid phone number');
+                return false;
+            }
+            return true;
+        }
+
+        function saveProfileSettings() {
+            const profileData = {
+                firstName: document.getElementById('firstName').value.trim(),
+                lastName: document.getElementById('lastName').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                department: document.getElementById('department').value
+            };
+
+            if (!validateProfileData(profileData)) {
+                return;
+            }
+
+            localStorage.setItem('user', JSON.stringify(profileData));
+            
+            // Update header immediately
+            document.getElementById('userName').textContent = `${profileData.firstName} ${profileData.lastName}`;
+            document.getElementById('userInitials').textContent = `${profileData.firstName[0]}${profileData.lastName[0]}`;
+            
+            const profileSection = document.querySelector('.settings-section:nth-child(1)');
+            showSuccessMessage(profileSection, 'Profile settings saved successfully!');
+        }
+
+        function saveNotificationSettings() {
+            const settings = {
+                email: document.getElementById('emailNotif').checked,
+                sms: document.getElementById('smsNotif').checked,
+                push: document.getElementById('pushNotif').checked
+            };
+            localStorage.setItem('notificationSettings', JSON.stringify(settings));
+            
+            const notificationSection = document.querySelector('.settings-section:nth-child(2)');
+            showSuccessMessage(notificationSection, 'Notification preferences updated!');
+        }
+
+        function savePrivacySettings() {
+            const settings = {
+                profileVisible: document.getElementById('profileVisibility').checked,
+                tripHistoryVisible: document.getElementById('tripHistory').checked
+            };
+            localStorage.setItem('privacySettings', JSON.stringify(settings));
+            
+            const privacySection = document.querySelector('.settings-section:nth-child(3)');
+            showSuccessMessage(privacySection, 'Privacy settings updated!');
+        }
+
+        function addPaymentMethod() {
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h3>Add Payment Method</h3>
+                    <form id="paymentForm">
+                        <div class="form-group">
+                            <label>Card Number</label>
+                            <input type="text" placeholder="**** **** **** ****" maxlength="19">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Expiry Date</label>
+                                <input type="text" placeholder="MM/YY" maxlength="5">
+                            </div>
+                            <div class="form-group">
+                                <label>CVV</label>
+                                <input type="text" placeholder="***" maxlength="3">
+                            </div>
+                        </div>
+                        <div class="modal-actions">
+                            <button type="button" class="btn-secondary" onclick="this.closest('.modal').remove()">Cancel</button>
+                            <button type="button" class="btn-primary" onclick="saveNewCard(this)">Add Card</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function saveNewCard(button) {
+            // In a real application, this would validate and securely process the card
+            const modal = button.closest('.modal');
+            const paymentSettings = JSON.parse(localStorage.getItem('paymentSettings')) || {
+                defaultPayment: 'credit_card',
+                savedCards: []
+            };
+            paymentSettings.savedCards.push('**** **** **** ' + Math.floor(1000 + Math.random() * 9000));
+            localStorage.setItem('paymentSettings', JSON.stringify(paymentSettings));
+            modal.remove();
+            
+            const paymentSection = document.querySelector('.settings-section:nth-child(4)');
+            showSuccessMessage(paymentSection, 'New payment method added!');
+            
+            // Refresh the page to show the new card
+            location.reload();
+        }
+
+        function changePassword() {
+            const currentPassword = prompt('Enter current password:');
+            if (!currentPassword) return;
+            
+            const newPassword = prompt('Enter new password:');
+            if (!newPassword) return;
+            
+            if (newPassword.length < 8) {
+                alert('Password must be at least 8 characters long');
+                return;
+            }
+            
+            const confirmPassword = prompt('Confirm new password:');
+            if (newPassword !== confirmPassword) {
+                alert('Passwords do not match');
+                return;
+            }
+            
+            // In a real application, this would make an API call to change the password
+            const accountSection = document.querySelector('.settings-section:nth-child(5)');
+            showSuccessMessage(accountSection, 'Password updated successfully!');
+        }
+
+        function deactivateAccount() {
+            if (confirm('Are you sure you want to deactivate your account? You can reactivate it later.')) {
+                if (prompt('Type "DEACTIVATE" to confirm:') === 'DEACTIVATE') {
+                    // In a real application, this would make an API call to deactivate the account
+                    alert('Account deactivated. You will be logged out.');
+                    logout();
+                }
+            }
+        }
+
+        function deleteAccount() {
+            if (confirm('WARNING: This action cannot be undone. Are you sure you want to permanently delete your account?')) {
+                if (prompt('Type "DELETE" to confirm account deletion:') === 'DELETE') {
+                    // In a real application, this would make an API call to delete the account
+                    alert('Account deleted. You will be redirected to the home page.');
+                    logout();
+                }
+            }
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html> 

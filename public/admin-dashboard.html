@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Campus Vehicle Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #7C3AED;
+            --secondary-color: #EC4899;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+            --background-color: #F9FAFB;
+            --card-bg: #FFFFFF;
+            --text-primary: #1F2937;
+            --text-secondary: #6B7280;
+            --border-color: #E5E7EB;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-right: 1px solid var(--border-color);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .admin-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card h3 {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .data-table {
+            background: var(--card-bg);
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: #F8FAFC;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .action-button {
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+        }
+
+        .approve {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .reject {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .view {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .nav-links {
+            list-style: none;
+            margin-top: 2rem;
+        }
+
+        .nav-links li {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.375rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            background: rgba(124, 58, 237, 0.1);
+            color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-bar input {
+            flex: 1;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+        }
+
+        .filter-button {
+            padding: 0.5rem 1rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            cursor: pointer;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .close {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        /* Add notification styles */
+        .notifications-list {
+            padding: 1rem;
+        }
+
+        .notification-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .notification-message {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .notification-time {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .notification-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-left: 1rem;
+        }
+
+        /* Add settings styles */
+        .settings-section {
+            background: var(--card-bg);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .settings-section h3 {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .settings-form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .settings-form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: var(--primary-color);
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2 class="admin-title">Admin Panel</h2>
+        <ul class="nav-links">
+            <li><a href="#dashboard" class="active" onclick="showTab('dashboard')">
+                <i class="fas fa-chart-line"></i> Dashboard
+            </a></li>
+            <li><a href="#notifications" onclick="showTab('notifications')">
+                <i class="fas fa-bell"></i> Notifications
+            </a></li>
+            <li><a href="#users" onclick="showTab('users')">
+                <i class="fas fa-users"></i> Users
+            </a></li>
+            <li><a href="#vehicles" onclick="showTab('vehicles')">
+                <i class="fas fa-car"></i> Vehicles
+            </a></li>
+            <li><a href="#carpools" onclick="showTab('carpools')">
+                <i class="fas fa-route"></i> Carpools
+            </a></li>
+            <li><a href="#reports" onclick="showTab('reports')">
+                <i class="fas fa-chart-bar"></i> Reports
+            </a></li>
+            <li><a href="#settings" onclick="showTab('settings')">
+                <i class="fas fa-cog"></i> Settings
+            </a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="admin-header">
+            <h1>Admin Dashboard</h1>
+            <div class="admin-profile">
+                <span id="adminName">Admin User</span>
+                <button class="action-button" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Users</h3>
+                    <div class="value" id="totalUsers">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Active Vehicles</h3>
+                    <div class="value" id="activeVehicles">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Active Carpools</h3>
+                    <div class="value" id="activeCarpools">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Pending Approvals</h3>
+                    <div class="value" id="pendingApprovals">0</div>
+                </div>
+            </div>
+
+            <div class="data-table">
+                <div class="table-header">
+                    <h2>Recent Activities</h2>
+                </div>
+                <table id="activitiesTable">
+                    <thead>
+                        <tr>
+                            <th>Activity</th>
+                            <th>User</th>
+                            <th>Type</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Activities will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Users Tab -->
+        <div id="users" class="tab-content">
+            <div class="search-bar">
+                <input type="text" placeholder="Search users..." onkeyup="searchUsers(this.value)">
+                <button class="filter-button" onclick="filterUsers()">
+                    <i class="fas fa-filter"></i> Filter
+                </button>
+            </div>
+            <div class="data-table">
+                <div class="table-header">
+                    <h2>User Management</h2>
+                </div>
+                <table id="usersTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Department</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Users will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Vehicles Tab -->
+        <div id="vehicles" class="tab-content">
+            <div class="search-bar">
+                <input type="text" placeholder="Search vehicles..." onkeyup="searchVehicles(this.value)">
+                <button class="filter-button" onclick="filterVehicles()">
+                    <i class="fas fa-filter"></i> Filter
+                </button>
+                <button class="action-button view" onclick="showAddVehicleModal()">
+                    <i class="fas fa-plus"></i> Add Vehicle
+                </button>
+            </div>
+            <div class="data-table">
+                <div class="table-header">
+                    <h2>Vehicle Management</h2>
+                </div>
+                <table id="vehiclesTable">
+                    <thead>
+                        <tr>
+                            <th>License Plate</th>
+                            <th>Owner</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Vehicles will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Carpools Tab -->
+        <div id="carpools" class="tab-content">
+            <div class="search-bar">
+                <input type="text" placeholder="Search carpools..." onkeyup="searchCarpools(this.value)">
+                <button class="filter-button" onclick="filterCarpools()">
+                    <i class="fas fa-filter"></i> Filter
+                </button>
+            </div>
+            <div class="data-table">
+                <div class="table-header">
+                    <h2>Carpool Management</h2>
+                </div>
+                <table id="carpoolsTable">
+                    <thead>
+                        <tr>
+                            <th>Route</th>
+                            <th>Driver</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Carpools will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Reports Tab -->
+        <div id="reports" class="tab-content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Rides</h3>
+                    <div class="value" id="totalRides">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Active Users</h3>
+                    <div class="value" id="activeUsers">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Revenue</h3>
+                    <div class="value" id="totalRevenue">€0</div>
+                </div>
+            </div>
+            <!-- Add more report sections here -->
+        </div>
+
+        <!-- Notifications Tab -->
+        <div id="notifications" class="tab-content">
+            <div class="data-table">
+                <div class="table-header">
+                    <h2>System Notifications</h2>
+                    <button class="action-button" onclick="clearAllNotifications()">Clear All</button>
+                </div>
+                <div id="notificationsList" class="notifications-list">
+                    <!-- Notifications will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="settings" class="tab-content">
+            <div class="data-table">
+                <div class="table-header">
+                    <h2>System Settings</h2>
+                </div>
+                <div style="padding: 1.5rem;">
+                    <form id="settingsForm" onsubmit="handleSettingsSubmit(event)">
+                        <div class="settings-section">
+                            <h3>Email Settings</h3>
+                            <div class="settings-form-group">
+                                <label for="systemEmail">System Email</label>
+                                <input type="email" id="systemEmail" required>
+                            </div>
+                        </div>
+                        <div class="settings-section">
+                            <h3>Notification Preferences</h3>
+                            <div class="settings-form-group">
+                                <div class="toggle-group">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="emailNotifications">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                    <span>Email Notifications</span>
+                                </div>
+                                <div class="toggle-group">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="smsNotifications">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                    <span>SMS Notifications</span>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="action-button view">Save Settings</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Vehicle Modal -->
+        <div id="addVehicleModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Add New Vehicle</h2>
+                    <span class="close" onclick="closeAddVehicleModal()">&times;</span>
+                </div>
+                <form id="addVehicleForm" onsubmit="handleAddVehicle(event)">
+                    <div class="form-group">
+                        <label for="licensePlate">License Plate *</label>
+                        <input type="text" id="licensePlate" name="licensePlate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="vehicleType">Vehicle Type *</label>
+                        <select id="vehicleType" name="type" required>
+                            <option value="">Select Type</option>
+                            <option value="Sedan">Sedan</option>
+                            <option value="SUV">SUV</option>
+                            <option value="Van">Van</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="model">Model *</label>
+                        <input type="text" id="model" name="model" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="year">Year *</label>
+                        <input type="number" id="year" name="year" min="1900" max="2024" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="color">Color *</label>
+                        <input type="text" id="color" name="color" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="capacity">Seating Capacity *</label>
+                        <input type="number" id="capacity" name="capacity" min="1" max="15" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="action-button" onclick="closeAddVehicleModal()">Cancel</button>
+                        <button type="submit" class="action-button view">Add Vehicle</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load admin data when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            setupWebSocket();
+            loadAdminData();
+            loadDashboardStats();
+            loadRecentActivities();
+            loadUsers();
+            loadVehicles();
+            loadCarpools();
+            loadReports();
+            loadSettings();
+        });
+
+        // Tab switching functionality
+        function showTab(tabId) {
+            console.log('Switching to tab:', tabId); // Debug log
+            
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            const selectedTab = document.getElementById(tabId);
+            if (selectedTab) {
+                selectedTab.classList.add('active');
+                
+                // Update navigation
+                document.querySelectorAll('.nav-links a').forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === '#' + tabId) {
+                        link.classList.add('active');
+                    }
+                });
+                
+                // Load data based on the selected tab
+                switch(tabId) {
+                    case 'dashboard':
+                        loadDashboardStats();
+                        loadRecentActivities();
+                        break;
+                    case 'notifications':
+                        loadNotifications();
+                        break;
+                    case 'users':
+                        loadUsers();
+                        break;
+                    case 'vehicles':
+                        loadVehicles();
+                        break;
+                    case 'carpools':
+                        loadCarpools();
+                        break;
+                    case 'reports':
+                        loadReports();
+                        break;
+                    case 'settings':
+                        loadSettings();
+                        break;
+                }
+            } else {
+                console.error('Tab not found:', tabId);
+            }
+        }
+
+        // Load admin data
+        function loadAdminData() {
+            const adminData = JSON.parse(localStorage.getItem('user'));
+            if (adminData) {
+                document.getElementById('adminName').textContent = adminData.name;
+            }
+        }
+
+        // Load dashboard statistics
+        async function loadDashboardStats() {
+            try {
+                const response = await fetch('/api/admin/stats', {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+                const data = await response.json();
+                
+                document.getElementById('totalUsers').textContent = data.totalUsers;
+                document.getElementById('activeVehicles').textContent = data.activeVehicles;
+                document.getElementById('activeCarpools').textContent = data.activeCarpools;
+                document.getElementById('pendingApprovals').textContent = data.pendingApprovals;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Load recent activities
+        async function loadRecentActivities() {
+            try {
+                const response = await fetch('/api/admin/activities', {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+                const activities = await response.json();
+                
+                const tbody = document.querySelector('#activitiesTable tbody');
+                tbody.innerHTML = '';
+                
+                activities.forEach(activity => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${activity.description}</td>
+                        <td>${activity.user}</td>
+                        <td>${activity.type}</td>
+                        <td>${new Date(activity.date).toLocaleDateString()}</td>
+                        <td>${activity.status}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Error loading activities:', error);
+            }
+        }
+
+        // Load users
+        async function loadUsers() {
+            try {
+                const response = await fetch('/api/admin/users', {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+                const users = await response.json();
+                
+                const tbody = document.querySelector('#usersTable tbody');
+                tbody.innerHTML = '';
+                
+                users.forEach(user => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${user.name}</td>
+                        <td>${user.email}</td>
+                        <td>${user.department}</td>
+                        <td>${user.role}</td>
+                        <td>${user.status}</td>
+                        <td>
+                            <button class="action-button view" onclick="viewUser(${user.id})">View</button>
+                            <button class="action-button ${user.status === 'active' ? 'reject' : 'approve'}"
+                                    onclick="toggleUserStatus(${user.id})">
+                                ${user.status === 'active' ? 'Deactivate' : 'Activate'}
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+
+        // WebSocket connection setup
+        let ws;
+        function setupWebSocket() {
+            ws = new WebSocket('ws://' + window.location.hostname + ':3000');
+            
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                console.log('WebSocket message received:', data); // Debug log
+                
+                switch (data.type) {
+                    case 'new_vehicle':
+                        console.log('New vehicle added, updating list...'); // Debug log
+                        loadVehicles();
+                        showToast('New vehicle added');
+                        updateDashboardStats();
+                        break;
+                    case 'new_carpool':
+                        console.log('New carpool added, updating list...'); // Debug log
+                        loadCarpools();
+                        showToast('New carpool added');
+                        updateDashboardStats();
+                        break;
+                    case 'vehicle_update':
+                        loadVehicles();
+                        break;
+                    case 'carpool_update':
+                        loadCarpools();
+                        break;
+                }
+            };
+
+            ws.onopen = () => {
+                console.log('WebSocket connection established'); // Debug log
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error); // Debug log
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket connection closed, attempting to reconnect...'); // Debug log
+                setTimeout(setupWebSocket, 5000);
+            };
+        }
+
+        // Update dashboard stats
+        async function updateDashboardStats() {
+            try {
+                const response = await fetch('/api/admin/stats', {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+                const data = await response.json();
+                
+                // Update stats with animation
+                animateValue('totalUsers', parseInt(document.getElementById('totalUsers').textContent), data.totalUsers);
+                animateValue('activeVehicles', parseInt(document.getElementById('activeVehicles').textContent), data.activeVehicles);
+                animateValue('activeCarpools', parseInt(document.getElementById('activeCarpools').textContent), data.activeCarpools);
+                animateValue('pendingApprovals', parseInt(document.getElementById('pendingApprovals').textContent), data.pendingApprovals);
+            } catch (error) {
+                console.error('Error updating stats:', error);
+            }
+        }
+
+        // Animate value change
+        function animateValue(elementId, start, end) {
+            const duration = 1000; // Animation duration in milliseconds
+            const element = document.getElementById(elementId);
+            const range = end - start;
+            const startTime = performance.now();
+            
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                const value = Math.floor(start + (range * progress));
+                element.textContent = value;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+            
+            requestAnimationFrame(update);
+        }
+
+        // Modify the existing load functions to handle real-time updates
+        async function loadVehicles() {
+            try {
+                const response = await fetch('/api/admin/vehicles', {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+                const vehicles = await response.json();
+                
+                const tbody = document.querySelector('#vehiclesTable tbody');
+                
+                // Create a document fragment for better performance
+                const fragment = document.createDocumentFragment();
+                
+                vehicles.forEach(vehicle => {
+                    const tr = document.createElement('tr');
+                    tr.dataset.id = vehicle.id; // Add data attribute for easy reference
+                    tr.innerHTML = `
+                        <td>${vehicle.licensePlate}</td>
+                        <td>${vehicle.owner}</td>
+                        <td>${vehicle.type}</td>
+                        <td>${vehicle.status}</td>
+                        <td>
+                            <button class="action-button view" onclick="viewVehicle(${vehicle.id})">View</button>
+                            <button class="action-button ${vehicle.status === 'approved' ? 'reject' : 'approve'}"
+                                    onclick="toggleVehicleStatus(${vehicle.id})">
+                                ${vehicle.status === 'approved' ? 'Reject' : 'Approve'}
+                            </button>
+                        </td>
+                    `;
+                    fragment.appendChild(tr);
+                });
+                
+                // Smoothly update the table
+                const oldRows = tbody.getElementsByTagName('tr');
+                const oldRowsArray = Array.from(oldRows);
+                
+                // Remove old rows with fade-out animation
+                oldRowsArray.forEach(row => {
+                    row.style.animation = 'fadeOut 0.3s ease-out';
+                });
+                
+                setTimeout(() => {
+                    tbody.innerHTML = '';
+                    tbody.appendChild(fragment);
+                    
+                    // Add fade-in animation to new rows
+                    const newRows = tbody.getElementsByTagName('tr');
+                    Array.from(newRows).forEach(row => {
+                        row.style.animation = 'fadeIn 0.3s ease-out';
+                    });
+                }, 300);
+            } catch (error) {
+                console.error('Error loading vehicles:', error);
+            }
+        }
+
+        async function loadCarpools() {
+            try {
+                console.log('Loading carpools...'); // Debug log
+                const response = await fetch('/api/admin/carpools', {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const carpools = await response.json();
+                console.log('Carpools loaded:', carpools); // Debug log
+                
+                const tbody = document.querySelector('#carpoolsTable tbody');
+                const fragment = document.createDocumentFragment();
+                
+                carpools.forEach(carpool => {
+                    const tr = document.createElement('tr');
+                    tr.dataset.id = carpool.id;
+                    tr.innerHTML = `
+                        <td>${carpool.route}</td>
+                        <td>${carpool.driver}</td>
+                        <td>${new Date(carpool.date).toLocaleDateString()}</td>
+                        <td>${carpool.status}</td>
+                        <td>
+                            <button class="action-button view" onclick="viewCarpool(${carpool.id})">View</button>
+                            <button class="action-button ${carpool.status === 'active' ? 'reject' : 'approve'}"
+                                    onclick="toggleCarpoolStatus(${carpool.id})">
+                                ${carpool.status === 'active' ? 'Cancel' : 'Activate'}
+                            </button>
+                        </td>
+                    `;
+                    fragment.appendChild(tr);
+                });
+
+                // Smoothly update the table
+                const oldRows = tbody.getElementsByTagName('tr');
+                Array.from(oldRows).forEach(row => {
+                    row.style.animation = 'fadeOut 0.3s ease-out';
+                });
+                
+                setTimeout(() => {
+                    tbody.innerHTML = '';
+                    tbody.appendChild(fragment);
+                    
+                    Array.from(tbody.getElementsByTagName('tr')).forEach(row => {
+                        row.style.animation = 'fadeIn 0.3s ease-out';
+                    });
+                }, 300);
+            } catch (error) {
+                console.error('Error loading carpools:', error);
+                showToast('Failed to load carpools', 'error');
+            }
+        }
+
+        // Search functions
+        function searchUsers(query) {
+            const tbody = document.querySelector('#usersTable tbody');
+            const rows = tbody.getElementsByTagName('tr');
+            
+            query = query.toLowerCase();
+            for (let row of rows) {
+                const name = row.cells[0].textContent.toLowerCase();
+                const email = row.cells[1].textContent.toLowerCase();
+                const department = row.cells[2].textContent.toLowerCase();
+                
+                if (name.includes(query) || email.includes(query) || department.includes(query)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        }
+
+        function searchVehicles(query) {
+            const tbody = document.querySelector('#vehiclesTable tbody');
+            const rows = tbody.getElementsByTagName('tr');
+            
+            query = query.toLowerCase();
+            for (let row of rows) {
+                const licensePlate = row.cells[0].textContent.toLowerCase();
+                const owner = row.cells[1].textContent.toLowerCase();
+                const type = row.cells[2].textContent.toLowerCase();
+                
+                if (licensePlate.includes(query) || owner.includes(query) || type.includes(query)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        }
+
+        function searchCarpools(query) {
+            const tbody = document.querySelector('#carpoolsTable tbody');
+            const rows = tbody.getElementsByTagName('tr');
+            
+            query = query.toLowerCase();
+            for (let row of rows) {
+                const route = row.cells[0].textContent.toLowerCase();
+                const driver = row.cells[1].textContent.toLowerCase();
+                const date = row.cells[2].textContent.toLowerCase();
+                
+                if (route.includes(query) || driver.includes(query) || date.includes(query)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            }
+        }
+
+        // Filter functions
+        function filterUsers() {
+            const filterOptions = {
+                role: ['Admin', 'User', 'Driver'],
+                status: ['Active', 'Inactive', 'Pending']
+            };
+            
+            showFilterModal('Users', filterOptions, (selectedFilters) => {
+                const tbody = document.querySelector('#usersTable tbody');
+                const rows = tbody.getElementsByTagName('tr');
+                
+                for (let row of rows) {
+                    const role = row.cells[3].textContent;
+                    const status = row.cells[4].textContent;
+                    
+                    const roleMatch = !selectedFilters.role || selectedFilters.role.includes(role);
+                    const statusMatch = !selectedFilters.status || selectedFilters.status.includes(status);
+                    
+                    row.style.display = (roleMatch && statusMatch) ? '' : 'none';
+                }
+            });
+        }
+
+        function filterVehicles() {
+            const filterOptions = {
+                type: ['Sedan', 'SUV', 'Van'],
+                status: ['Approved', 'Pending', 'Rejected']
+            };
+            
+            showFilterModal('Vehicles', filterOptions, (selectedFilters) => {
+                const tbody = document.querySelector('#vehiclesTable tbody');
+                const rows = tbody.getElementsByTagName('tr');
+                
+                for (let row of rows) {
+                    const type = row.cells[2].textContent;
+                    const status = row.cells[3].textContent;
+                    
+                    const typeMatch = !selectedFilters.type || selectedFilters.type.includes(type);
+                    const statusMatch = !selectedFilters.status || selectedFilters.status.includes(status);
+                    
+                    row.style.display = (typeMatch && statusMatch) ? '' : 'none';
+                }
+            });
+        }
+
+        function filterCarpools() {
+            const filterOptions = {
+                status: ['Active', 'Completed', 'Cancelled'],
+                date: 'date'
+            };
+            
+            showFilterModal('Carpools', filterOptions, (selectedFilters) => {
+                const tbody = document.querySelector('#carpoolsTable tbody');
+                const rows = tbody.getElementsByTagName('tr');
+                
+                for (let row of rows) {
+                    const status = row.cells[3].textContent;
+                    const date = new Date(row.cells[2].textContent);
+                    
+                    const statusMatch = !selectedFilters.status || selectedFilters.status.includes(status);
+                    const dateMatch = !selectedFilters.date || 
+                                    ((!selectedFilters.date.start || date >= new Date(selectedFilters.date.start)) &&
+                                     (!selectedFilters.date.end || date <= new Date(selectedFilters.date.end)));
+                    
+                    row.style.display = (statusMatch && dateMatch) ? '' : 'none';
+                }
+            });
+        }
+
+        // Filter modal functionality
+        function showFilterModal(title, options, callback) {
+            // Create modal element
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+            `;
+            
+            // Create modal content
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: white;
+                padding: 2rem;
+                border-radius: 0.5rem;
+                width: 90%;
+                max-width: 500px;
+            `;
+            
+            // Add title
+            content.innerHTML = `<h2 style="margin-bottom: 1.5rem;">Filter ${title}</h2>`;
+            
+            // Add filter options
+            const form = document.createElement('form');
+            Object.entries(options).forEach(([key, value]) => {
+                const fieldset = document.createElement('fieldset');
+                fieldset.style.cssText = `
+                    border: none;
+                    margin-bottom: 1.5rem;
+                    padding: 0;
+                `;
+                
+                fieldset.innerHTML = `<legend style="font-weight: 500; margin-bottom: 0.5rem;">${key.charAt(0).toUpperCase() + key.slice(1)}</legend>`;
+                
+                if (value === 'date') {
+                    fieldset.innerHTML += `
+                        <div style="display: flex; gap: 1rem;">
+                            <div style="flex: 1;">
+                                <label>Start Date</label>
+                                <input type="date" name="${key}_start" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                            </div>
+                            <div style="flex: 1;">
+                                <label>End Date</label>
+                                <input type="date" name="${key}_end" style="width: 100%; padding: 0.5rem; margin-top: 0.25rem;">
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    value.forEach(option => {
+                        fieldset.innerHTML += `
+                            <div style="margin-bottom: 0.5rem;">
+                                <input type="checkbox" name="${key}" value="${option}" id="${key}_${option}">
+                                <label for="${key}_${option}">${option}</label>
+                            </div>
+                        `;
+                    });
+                }
+                
+                form.appendChild(fieldset);
+            });
+            
+            // Add buttons
+            form.innerHTML += `
+                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button type="button" class="action-button" style="background: var(--border-color);" onclick="this.closest('.filter-modal').remove()">Cancel</button>
+                    <button type="submit" class="action-button view">Apply Filters</button>
+                </div>
+            `;
+            
+            // Handle form submission
+            form.onsubmit = (e) => {
+                e.preventDefault();
+                const formData = new FormData(form);
+                const filters = {};
+                
+                Object.keys(options).forEach(key => {
+                    if (options[key] === 'date') {
+                        filters[key] = {
+                            start: formData.get(`${key}_start`),
+                            end: formData.get(`${key}_end`)
+                        };
+                    } else {
+                        filters[key] = Array.from(formData.getAll(key));
+                    }
+                });
+                
+                callback(filters);
+                modal.remove();
+            };
+            
+            content.appendChild(form);
+            modal.appendChild(content);
+            modal.classList.add('filter-modal');
+            document.body.appendChild(modal);
+        }
+
+        // Action functions
+        async function viewUser(userId) {
+            try {
+                const response = await fetch(`/api/admin/users/${userId}`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+                const user = await response.json();
+                
+                showDetailsModal('User Details', {
+                    'Name': user.name,
+                    'Email': user.email,
+                    'Department': user.department,
+                    'Role': user.role,
+                    'Status': user.status,
+                    'Join Date': new Date(user.joinDate).toLocaleDateString(),
+                    'Last Login': new Date(user.lastLogin).toLocaleDateString()
+                });
+            } catch (error) {
+                console.error('Error loading user details:', error);
+                alert('Failed to load user details');
+            }
+        }
+
+        async function toggleUserStatus(userId) {
+            try {
+                const response = await fetch(`/api/admin/users/${userId}/toggle-status`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+                
+                if (response.ok) {
+                    loadUsers(); // Reload the users table
+                    showToast('User status updated successfully');
+                } else {
+                    throw new Error('Failed to update user status');
+                }
+            } catch (error) {
+                console.error('Error updating user status:', error);
+                alert('Failed to update user status');
+            }
+        }
+
+        async function viewVehicle(vehicleId) {
+            try {
+                const response = await fetch(`/api/admin/vehicles/${vehicleId}`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+                const vehicle = await response.json();
+                
+                showDetailsModal('Vehicle Details', {
+                    'License Plate': vehicle.licensePlate,
+                    'Owner': vehicle.owner,
+                    'Type': vehicle.type,
+                    'Model': vehicle.model,
+                    'Year': vehicle.year,
+                    'Status': vehicle.status,
+                    'Registration Date': new Date(vehicle.registrationDate).toLocaleDateString(),
+                    'Last Inspection': new Date(vehicle.lastInspection).toLocaleDateString()
+                });
+            } catch (error) {
+                console.error('Error loading vehicle details:', error);
+                alert('Failed to load vehicle details');
+            }
+        }
+
+        async function toggleVehicleStatus(vehicleId) {
+            try {
+                const response = await fetch(`/api/admin/vehicles/${vehicleId}/toggle-status`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+                
+                if (response.ok) {
+                    loadVehicles(); // Reload the vehicles table
+                    showToast('Vehicle status updated successfully');
+                } else {
+                    throw new Error('Failed to update vehicle status');
+                }
+            } catch (error) {
+                console.error('Error updating vehicle status:', error);
+                alert('Failed to update vehicle status');
+            }
+        }
+
+        async function viewCarpool(carpoolId) {
+            try {
+                const response = await fetch(`/api/admin/carpools/${carpoolId}`, {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+                const carpool = await response.json();
+                
+                showDetailsModal('Carpool Details', {
+                    'Route': carpool.route,
+                    'Driver': carpool.driver,
+                    'Vehicle': carpool.vehicle,
+                    'Date': new Date(carpool.date).toLocaleDateString(),
+                    'Time': carpool.time,
+                    'Status': carpool.status,
+                    'Capacity': carpool.capacity,
+                    'Passengers': carpool.passengers.join(', '),
+                    'Price': `€${carpool.price}`
+                });
+            } catch (error) {
+                console.error('Error loading carpool details:', error);
+                alert('Failed to load carpool details');
+            }
+        }
+
+        async function toggleCarpoolStatus(carpoolId) {
+            try {
+                const response = await fetch(`/api/admin/carpools/${carpoolId}/toggle-status`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+                
+                if (response.ok) {
+                    loadCarpools(); // Reload the carpools table
+                    showToast('Carpool status updated successfully');
+                } else {
+                    throw new Error('Failed to update carpool status');
+                }
+            } catch (error) {
+                console.error('Error updating carpool status:', error);
+                alert('Failed to update carpool status');
+            }
+        }
+
+        // Details modal functionality
+        function showDetailsModal(title, details) {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+            `;
+            
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: white;
+                padding: 2rem;
+                border-radius: 0.5rem;
+                width: 90%;
+                max-width: 500px;
+            `;
+            
+            content.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2>${title}</h2>
+                    <button class="action-button" style="background: var(--border-color);" onclick="this.closest('.details-modal').remove()">Close</button>
+                </div>
+                <div style="display: grid; gap: 1rem;">
+                    ${Object.entries(details).map(([key, value]) => `
+                        <div>
+                            <div style="font-weight: 500; color: var(--text-secondary);">${key}</div>
+                            <div>${value}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            modal.appendChild(content);
+            modal.classList.add('details-modal');
+            document.body.appendChild(modal);
+        }
+
+        // Toast notification functionality
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 2rem;
+                right: 2rem;
+                background: var(--success-color);
+                color: white;
+                padding: 1rem 2rem;
+                border-radius: 0.375rem;
+                animation: slideIn 0.3s ease-out;
+                z-index: 1000;
+            `;
+            
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            
+            @keyframes fadeOut {
+                from { opacity: 1; transform: translateY(0); }
+                to { opacity: 0; transform: translateY(-10px); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Logout function
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+
+        // Vehicle management functions
+        function showAddVehicleModal() {
+            document.getElementById('addVehicleModal').classList.add('show');
+        }
+
+        function closeAddVehicleModal() {
+            document.getElementById('addVehicleModal').classList.remove('show');
+            document.getElementById('addVehicleForm').reset();
+        }
+
+        async function handleAddVehicle(event) {
+            event.preventDefault();
+            
+            const form = event.target;
+            const formData = new FormData(form);
+            const vehicleData = Object.fromEntries(formData.entries());
+            
+            try {
+                const response = await fetch('/api/vehicles', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    },
+                    body: JSON.stringify(vehicleData)
+                });
+                
+                if (response.ok) {
+                    showToast('Vehicle added successfully');
+                    closeAddVehicleModal();
+                    loadVehicles(); // Reload the vehicles table
+                    updateDashboardStats();
+                } else {
+                    throw new Error('Failed to add vehicle');
+                }
+            } catch (error) {
+                console.error('Error adding vehicle:', error);
+                alert('Failed to add vehicle. Please try again.');
+            }
+        }
+
+        // Add notification functions
+        async function loadNotifications() {
+            try {
+                const response = await fetch('/api/admin/notifications', {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+                const notifications = await response.json();
+                
+                const notificationsList = document.getElementById('notificationsList');
+                notificationsList.innerHTML = '';
+                
+                notifications.forEach(notification => {
+                    const div = document.createElement('div');
+                    div.className = 'notification-item';
+                    div.dataset.id = notification.id;
+                    div.innerHTML = `
+                        <div class="notification-content">
+                            <div class="notification-title">${notification.title}</div>
+                            <div class="notification-message">${notification.message}</div>
+                            <div class="notification-time">${new Date(notification.timestamp).toLocaleString()}</div>
+                        </div>
+                        <div class="notification-actions">
+                            <button class="action-button view" onclick="viewNotification(${notification.id})">View</button>
+                            <button class="action-button reject" onclick="dismissNotification(${notification.id})">Dismiss</button>
+                        </div>
+                    `;
+                    notificationsList.appendChild(div);
+                });
+            } catch (error) {
+                console.error('Error loading notifications:', error);
+                showToast('Failed to load notifications', 'error');
+            }
+        }
+
+        async function clearAllNotifications() {
+            try {
+                const response = await fetch('/api/admin/notifications/clear', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+                
+                if (response.ok) {
+                    const notificationsList = document.getElementById('notificationsList');
+                    const notifications = notificationsList.getElementsByClassName('notification-item');
+                    
+                    Array.from(notifications).forEach(notification => {
+                        notification.style.animation = 'fadeOut 0.3s ease-out';
+                    });
+                    
+                    setTimeout(() => {
+                        notificationsList.innerHTML = '';
+                    }, 300);
+                    
+                    showToast('All notifications cleared');
+                } else {
+                    throw new Error('Failed to clear notifications');
+                }
+            } catch (error) {
+                console.error('Error clearing notifications:', error);
+                showToast('Failed to clear notifications', 'error');
+            }
+        }
+
+        async function dismissNotification(notificationId) {
+            try {
+                const response = await fetch(`/api/admin/notifications/${notificationId}/dismiss`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+                
+                if (response.ok) {
+                    const notification = document.querySelector(`.notification-item[data-id="${notificationId}"]`);
+                    if (notification) {
+                        notification.style.animation = 'fadeOut 0.3s ease-out';
+                        setTimeout(() => notification.remove(), 300);
+                    }
+                } else {
+                    throw new Error('Failed to dismiss notification');
+                }
+            } catch (error) {
+                console.error('Error dismissing notification:', error);
+                showToast('Failed to dismiss notification', 'error');
+            }
+        }
+
+        // Add settings functions
+        async function loadSettings() {
+            try {
+                const response = await fetch('/api/admin/settings', {
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    }
+                });
+                const settings = await response.json();
+                
+                // Update form fields with current settings
+                document.getElementById('systemEmail').value = settings.systemEmail || '';
+                document.getElementById('emailNotifications').checked = settings.emailNotifications || false;
+                document.getElementById('smsNotifications').checked = settings.smsNotifications || false;
+            } catch (error) {
+                console.error('Error loading settings:', error);
+                showToast('Failed to load settings', 'error');
+            }
+        }
+
+        // Add this function to handle settings form submission
+        async function handleSettingsSubmit(event) {
+            event.preventDefault();
+            
+            const settings = {
+                systemEmail: document.getElementById('systemEmail').value,
+                emailNotifications: document.getElementById('emailNotifications').checked,
+                smsNotifications: document.getElementById('smsNotifications').checked
+            };
+            
+            try {
+                const response = await fetch('/api/admin/settings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token')
+                    },
+                    body: JSON.stringify(settings)
+                });
+                
+                if (response.ok) {
+                    showToast('Settings saved successfully');
+                } else {
+                    throw new Error('Failed to save settings');
+                }
+            } catch (error) {
+                console.error('Error saving settings:', error);
+                showToast('Failed to save settings', 'error');
+            }
+        }
+
+        // Add event listeners for navigation
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add click event listeners to all navigation links
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const tabId = link.getAttribute('href').substring(1);
+                    showTab(tabId);
+                });
+            });
+
+            // Initial setup
+            setupWebSocket();
+            loadAdminData();
+            showTab('dashboard'); // Show dashboard by default
+        });
+    </script>
+</body>
+</html> 

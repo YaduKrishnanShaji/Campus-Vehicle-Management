@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - Campus Vehicle Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #7C3AED;
+            --secondary-color: #EC4899;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+            --background-color: #F9FAFB;
+            --sidebar-bg: #FFFFFF;
+            --card-bg: #FFFFFF;
+            --text-primary: #1F2937;
+            --text-secondary: #6B7280;
+            --border-color: #E5E7EB;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .brand span {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .nav-item:hover:not(.active) {
+            background-color: #F3F4F6;
+            color: var(--primary-color);
+        }
+
+        .nav-item i {
+            width: 1.5rem;
+            margin-right: 0.75rem;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            padding: 2rem;
+            width: calc(100% - 260px);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .notifications-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .notification-card {
+            background: var(--card-bg);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .notification-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .icon-info {
+            background-color: var(--primary-color);
+        }
+
+        .icon-success {
+            background-color: var(--success-color);
+        }
+
+        .icon-warning {
+            background-color: var(--warning-color);
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .notification-message {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .notification-time {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+        }
+
+        .notification-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-button {
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .action-button.primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .action-button.secondary {
+            background-color: #F3F4F6;
+            color: var(--text-primary);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .user-info h4 {
+            font-weight: 500;
+        }
+
+        .user-info p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .clear-all {
+            background: none;
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .clear-all:hover {
+            background: #F3F4F6;
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="brand">
+            <i class="fas fa-car-side"></i>
+            <span>CampusRide</span>
+        </div>
+        <nav class="nav-menu">
+            <a href="dashboard.html" class="nav-item">
+                <i class="fas fa-home"></i>
+                Dashboard
+            </a>
+            <a href="vehicles.html" class="nav-item">
+                <i class="fas fa-car"></i>
+                Vehicles
+            </a>
+            <a href="carpools.html" class="nav-item">
+                <i class="fas fa-users"></i>
+                Carpools
+            </a>
+            <a href="notifications.html" class="nav-item active">
+                <i class="fas fa-bell"></i>
+                Notifications
+            </a>
+            <a href="settings.html" class="nav-item">
+                <i class="fas fa-cog"></i>
+                Settings
+            </a>
+            <a href="index.html" class="nav-item" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="header">
+            <div class="user-profile">
+                <div class="user-avatar" id="userInitials">JS</div>
+                <div class="user-info">
+                    <h4 id="userName">John Smith</h4>
+                    <p>Admin</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-title">
+            Notifications
+            <button class="clear-all" onclick="clearAllNotifications()">
+                <i class="fas fa-trash"></i>
+                Clear All
+            </button>
+        </div>
+
+        <div class="notifications-list">
+            <!-- System Notifications -->
+            <div class="notification-card">
+                <div class="notification-icon icon-info">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div class="notification-content">
+                    <h3 class="notification-title">Welcome to CampusRide!</h3>
+                    <p class="notification-message">Get started by adding your vehicle or joining a carpool. Check out our quick start guide.</p>
+                    <span class="notification-time">Just now</span>
+                </div>
+                <div class="notification-actions">
+                    <button class="action-button primary">View Guide</button>
+                    <button class="action-button secondary" onclick="dismissNotification(this)">Dismiss</button>
+                </div>
+            </div>
+
+            <!-- Carpool Notifications -->
+            <div class="notification-card">
+                <div class="notification-icon icon-warning">
+                    <i class="fas fa-car"></i>
+                </div>
+                <div class="notification-content">
+                    <h3 class="notification-title">Upcoming Carpool Reminder</h3>
+                    <p class="notification-message">Your carpool from University Main Gate to Library starts in 30 minutes. 3 passengers are waiting.</p>
+                    <span class="notification-time">25 minutes ago</span>
+                </div>
+                <div class="notification-actions">
+                    <button class="action-button primary">View Details</button>
+                    <button class="action-button secondary" onclick="dismissNotification(this)">Dismiss</button>
+                </div>
+            </div>
+
+            <!-- Vehicle Notifications -->
+            <div class="notification-card">
+                <div class="notification-icon icon-success">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="notification-content">
+                    <h3 class="notification-title">Vehicle Registration Approved</h3>
+                    <p class="notification-message">Your vehicle Toyota Camry (ABC-123) has been approved for campus carpooling.</p>
+                    <span class="notification-time">1 hour ago</span>
+                </div>
+                <div class="notification-actions">
+                    <button class="action-button secondary" onclick="dismissNotification(this)">Dismiss</button>
+                </div>
+            </div>
+
+            <!-- Payment Notifications -->
+            <div class="notification-card">
+                <div class="notification-icon icon-info">
+                    <i class="fas fa-credit-card"></i>
+                </div>
+                <div class="notification-content">
+                    <h3 class="notification-title">Payment Received</h3>
+                    <p class="notification-message">Payment of €5.50 received for carpool trip to Sports Complex.</p>
+                    <span class="notification-time">2 hours ago</span>
+                </div>
+                <div class="notification-actions">
+                    <button class="action-button primary">View Receipt</button>
+                    <button class="action-button secondary" onclick="dismissNotification(this)">Dismiss</button>
+                </div>
+            </div>
+
+            <!-- Maintenance Notifications -->
+            <div class="notification-card">
+                <div class="notification-icon icon-warning">
+                    <i class="fas fa-wrench"></i>
+                </div>
+                <div class="notification-content">
+                    <h3 class="notification-title">Vehicle Maintenance Due</h3>
+                    <p class="notification-message">Your vehicle is due for maintenance check. Please update the maintenance status.</p>
+                    <span class="notification-time">1 day ago</span>
+                </div>
+                <div class="notification-actions">
+                    <button class="action-button primary">Update Status</button>
+                    <button class="action-button secondary" onclick="dismissNotification(this)">Dismiss</button>
+                </div>
+            </div>
+
+            <!-- Rating Notifications -->
+            <div class="notification-card">
+                <div class="notification-icon icon-info">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="notification-content">
+                    <h3 class="notification-title">Rate Your Recent Trip</h3>
+                    <p class="notification-message">How was your carpool experience with Sarah Johnson? Your feedback helps improve our community.</p>
+                    <span class="notification-time">2 days ago</span>
+                </div>
+                <div class="notification-actions">
+                    <button class="action-button primary">Rate Now</button>
+                    <button class="action-button secondary" onclick="dismissNotification(this)">Later</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Initialize user data and notifications
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load user data
+            const user = JSON.parse(localStorage.getItem('user')) || {
+                firstName: 'John',
+                lastName: 'Smith',
+                role: 'Admin'
+            };
+
+            // Update header
+            document.getElementById('userName').textContent = `${user.firstName} ${user.lastName}`;
+            document.getElementById('userInitials').textContent = `${user.firstName[0]}${user.lastName[0]}`;
+
+            // Load notification settings
+            const notificationSettings = JSON.parse(localStorage.getItem('notificationSettings'));
+            if (notificationSettings) {
+                // Only show notifications if they're enabled in settings
+                const notificationsList = document.querySelector('.notifications-list');
+                const notifications = notificationsList.querySelectorAll('.notification-card');
+                
+                notifications.forEach(notification => {
+                    const type = getNotificationType(notification);
+                    if (!shouldShowNotification(type, notificationSettings)) {
+                        notification.style.display = 'none';
+                    }
+                });
+            }
+
+            // Load saved notifications from localStorage
+            const savedNotifications = JSON.parse(localStorage.getItem('notifications')) || [];
+            if (savedNotifications.length > 0) {
+                const notificationsList = document.querySelector('.notifications-list');
+                savedNotifications.forEach(notif => {
+                    const notificationCard = createNotificationCard(notif);
+                    notificationsList.appendChild(notificationCard);
+                });
+            }
+        });
+
+        function getNotificationType(notificationElement) {
+            const icon = notificationElement.querySelector('.notification-icon i');
+            if (icon.classList.contains('fa-bell')) return 'system';
+            if (icon.classList.contains('fa-car')) return 'carpool';
+            if (icon.classList.contains('fa-check-circle')) return 'vehicle';
+            if (icon.classList.contains('fa-credit-card')) return 'payment';
+            if (icon.classList.contains('fa-wrench')) return 'maintenance';
+            if (icon.classList.contains('fa-star')) return 'rating';
+            return 'general';
+        }
+
+        function shouldShowNotification(type, settings) {
+            switch(type) {
+                case 'system':
+                    return true; // Always show system notifications
+                case 'carpool':
+                case 'vehicle':
+                case 'maintenance':
+                    return settings.push;
+                case 'payment':
+                    return settings.email;
+                case 'rating':
+                    return settings.email || settings.push;
+                default:
+                    return true;
+            }
+        }
+
+        function createNotificationCard(notification) {
+            const card = document.createElement('div');
+            card.className = 'notification-card';
+            card.innerHTML = `
+                <div class="notification-icon ${notification.iconClass}">
+                    <i class="fas ${notification.icon}"></i>
+                </div>
+                <div class="notification-content">
+                    <h3 class="notification-title">${notification.title}</h3>
+                    <p class="notification-message">${notification.message}</p>
+                    <span class="notification-time">${notification.time}</span>
+                </div>
+                <div class="notification-actions">
+                    ${notification.primaryAction ? 
+                        `<button class="action-button primary" onclick="${notification.primaryAction.onclick}">${notification.primaryAction.text}</button>` : 
+                        ''}
+                    <button class="action-button secondary" onclick="dismissNotification(this)">
+                        ${notification.secondaryAction || 'Dismiss'}
+                    </button>
+                </div>
+            `;
+            return card;
+        }
+
+        function clearAllNotifications() {
+            if (confirm('Are you sure you want to clear all notifications?')) {
+                const notificationsList = document.querySelector('.notifications-list');
+                notificationsList.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 2rem;">No notifications</p>';
+                localStorage.setItem('notifications', '[]');
+            }
+        }
+
+        function dismissNotification(button) {
+            const card = button.closest('.notification-card');
+            card.style.opacity = '0';
+            setTimeout(() => {
+                card.remove();
+                if (document.querySelectorAll('.notification-card').length === 0) {
+                    document.querySelector('.notifications-list').innerHTML = 
+                        '<p style="text-align: center; color: var(--text-secondary); padding: 2rem;">No notifications</p>';
+                }
+                
+                // Update saved notifications in localStorage
+                const remainingNotifications = Array.from(document.querySelectorAll('.notification-card')).map(card => ({
+                    title: card.querySelector('.notification-title').textContent,
+                    message: card.querySelector('.notification-message').textContent,
+                    time: card.querySelector('.notification-time').textContent,
+                    icon: card.querySelector('.notification-icon i').className,
+                    iconClass: card.querySelector('.notification-icon').className.split(' ')[1]
+                }));
+                localStorage.setItem('notifications', JSON.stringify(remainingNotifications));
+            }, 300);
+        }
+
+        function viewNotificationDetails(type, id) {
+            switch(type) {
+                case 'carpool':
+                    window.location.href = `carpools.html?id=${id}`;
+                    break;
+                case 'vehicle':
+                    window.location.href = `vehicles.html?id=${id}`;
+                    break;
+                case 'payment':
+                    // Show payment receipt modal
+                    alert('Payment details will be displayed in a modal');
+                    break;
+                case 'maintenance':
+                    window.location.href = `vehicles.html?maintenance=${id}`;
+                    break;
+                default:
+                    console.log('No specific action for this notification type');
+            }
+        }
+
+        function logout() {
+            localStorage.clear();
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html> 
